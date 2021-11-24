@@ -5,25 +5,28 @@ import Logo from './components/Logo/Logo';
 import ImageLinkForm from './components/ImageLinkForm/ImageLinkForm';
 import Rank from './components/Rank/Rank';
 import Particles from 'react-particles-js';
+import FaceRecognition from "./components/FaceRecognition/FaceRecognition"
+import Clarifai from "clarifai"
+
+const app =new Clarifai.App({
+  apiKey: "0f0c3e5c71af4fa2b8c22bc5a2806217"
+})
 
 const particleOptions = {
-  "particles": {
-      "number": {
-          "value": 50,
-          "density":{
-            "enable" : true,
-            "value_area": 800
-          }
-      },
-      "size": {
-          "value": 3
+  particles: {
+    number: {
+      value: 30,
+      density: {
+        enable: true,
+        value_area: 800
       }
+    }
   },
-  "interactivity": {
-      "events": {
-          "onhover": {
-              "enable": true,
-              "mode": "repulse"
+  interactivity: {
+      events: {
+          onhover: {
+              enable: true,
+              mode: "repulse"
           }
       }
   }
@@ -31,6 +34,37 @@ const particleOptions = {
 
 
 class App extends Component {
+  constructor(){
+    super()
+    this.state = {
+      input: "",
+      imageUrl: "", 
+      box: {}
+    }
+  }
+
+  calculateFaceLocation = (data) => {
+    const clarifaiFace = data.outputs[0].data.regions[0].region_info.bounding_box;
+    const image = document.getElementById("inputimage")
+    const height = Number(image.height)
+    const width = Number(image.width)
+    console.log(width,height)
+  }
+
+
+  onInputChange = (event) => {
+    this.setState({input: event.target.value})
+  }
+
+  onSubmit = () => {
+    this.setState({imageUrl: this.state.input})
+    app.models.predict(
+      Clarifai.FACE_DETECT_MODEL,
+      this.state.input)
+      .then( response => this.calculateFaceLocation(response))
+      .catch (err => console.log(err))
+  }
+
   render(){
     return(
       <div className="App">
@@ -38,8 +72,8 @@ class App extends Component {
         <Navigaton />
         <Logo />
         <Rank/>
-        <ImageLinkForm />
-        {/* <FaceRecognition /> */}
+        <ImageLinkForm onInputChange = {this.onInputChange} onSubmit = {this.onSubmit}/>
+        <FaceRecognition imageUrl = {this.state.imageUrl}/>
       </div>
     );
   }
