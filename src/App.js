@@ -12,37 +12,25 @@ const app =new Clarifai.App({
   apiKey: "0f0c3e5c71af4fa2b8c22bc5a2806217"
 })
 
-// const particleOptions = {
-//   particles: {
-//     number: {
-//       value: 30,
-//       density: {
-//         enable: true,
-//         value_area: 800
-//       }
-//     }
-//   },
-//   interactivity: {
-//       events: {
-//           onhover: {
-//               enable: true,
-//               mode: "repulse"
-//           }
-//       }
-//   }
-// }
 const particleOptions = {
   particles: {
     number: {
-      value: 30,
+      value: 50,
       density: {
         enable: true,
         value_area: 800
       }
     }
+  },
+  interactivity: {
+      events: {
+          onhover: {
+              enable: true,
+              mode: "repulse"
+          }
+      }
   }
 }
-
 
 class App extends Component {
   constructor(){
@@ -50,27 +38,31 @@ class App extends Component {
     this.state = {
       input: "",
       imageUrl: "", 
-      box: {}
+      box: {},
+      faces: []
     }
   }
 
   calculateFaceLocation = (data) => {
-    console.log(data)
-    const clarifaiFace = data.outputs[0].data.regions[0].region_info.bounding_box;
+    const clarifaiFace = data.outputs[0].data.regions.map(r => r.region_info.bounding_box)
     const image = document.getElementById("inputimage")
     const height = Number(image.height)
     const width = Number(image.width)
-    return{
-      leftCol: clarifaiFace.left_col * width,
-      topRow: clarifaiFace.top_row * height,
-      rightCol:  width - (clarifaiFace.right_col * width),
-      bottomRow : height - (clarifaiFace.bottom_row * height)
-    }
+    let resArr = []
+    clarifaiFace.forEach(element => {
+      resArr.push({
+        leftCol: element.left_col * width,
+        topRow: element.top_row * height,
+        rightCol:  width - (element.right_col * width),
+        bottomRow : height - (element.bottom_row * height)
+      })
+    });
+    return resArr
   }
 
-  displayFaceBox = (box) => {
-    // console.log(box)
-    this.setState({box:box})
+  displayFaceBox = (resArr) => {
+    this.setState({faces:resArr})
+    console.log(this.state.faces)
   }
 
 
@@ -88,6 +80,7 @@ class App extends Component {
   }
 
   render(){
+
     return(
       <div className="App">
         <Particles params = {particleOptions} className = "particle" />
@@ -95,7 +88,7 @@ class App extends Component {
         <Logo />
         <Rank/>
         <ImageLinkForm onInputChange = {this.onInputChange} onSubmit = {this.onSubmit}/>
-        <FaceRecognition box = {this.state.box} imageUrl = {this.state.imageUrl}/>
+        <FaceRecognition faces = {this.state.faces} imageUrl = {this.state.imageUrl}/>
       </div>
     );
   }
