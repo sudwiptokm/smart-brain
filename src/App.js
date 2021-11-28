@@ -80,11 +80,13 @@ class App extends Component {
         bottomRow : height - (element.bottom_row * height)
       })
     });
+    // console.log(resArr===undefined)
     return resArr
   }
 
   displayFaceBox = (resArr) => {
     this.setState({faces:resArr})
+    // console.log(resArr)
   }
 
 
@@ -98,7 +100,7 @@ class App extends Component {
       Clarifai.FACE_DETECT_MODEL,
         this.state.input)
       .then(response => {
-        console.log('hi', response)
+        // console.log('hi', response)
         if (response) {
           fetch('http://localhost:3000/image', {
             method: 'put',
@@ -111,11 +113,10 @@ class App extends Component {
             .then(count => {
               this.setState(Object.assign(this.state.user, { entries: count}))
             })
-
         }
         this.displayFaceBox(this.calculateFaceLocation(response))
       })
-      .catch(err => console.log(err));
+      .catch(err => this.setState({faces: []}));
   }
 
   onRouteChange = (r) => {
