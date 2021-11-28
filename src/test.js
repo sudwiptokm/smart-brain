@@ -1,2 +1,2 @@
 let a = [1,2,3,4]
-console.log([1,2,3,4]*2)
+console.log([1,2,3,4])
