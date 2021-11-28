@@ -14,10 +14,10 @@ const app =new Clarifai.App({
   apiKey: "0f0c3e5c71af4fa2b8c22bc5a2806217"
 })
 
-const particleOptions = {
+const particlesOption = {
   particles: {
     number: {
-      value: 5,
+      value: 50,
       density: {
         enable: true,
         value_area: 800
@@ -43,9 +43,28 @@ class App extends Component {
       box: {},
       faces: [],
       route: "signin",
-      isSignedIn: false
+      isSignedIn: false,
+      user: {
+        id: "",
+        name: "",
+        email: "",
+        entries: 0,
+        joined: ""
+      }
     }
   }
+
+
+  loadUser = (data) => {
+    this.setState({user : {
+      id: data.id,
+      name: data.name,
+      email: data.email,
+      entries: data.entries,
+      joined: data.joined
+    }})
+  }
+
 
   calculateFaceLocation = (data) => {
     const clarifaiFace = data.outputs[0].data.regions.map(r => r.region_info.bounding_box)
@@ -66,7 +85,6 @@ class App extends Component {
 
   displayFaceBox = (resArr) => {
     this.setState({faces:resArr})
-    console.log(this.state.faces)
   }
 
 
@@ -78,9 +96,26 @@ class App extends Component {
     this.setState({imageUrl: this.state.input})
     app.models.predict(
       Clarifai.FACE_DETECT_MODEL,
-      this.state.input)
-      .then( response => this.displayFaceBox(this.calculateFaceLocation(response)))
-      .catch (err => console.log(err))
+        this.state.input)
+      .then(response => {
+        console.log('hi', response)
+        if (response) {
+          fetch('http://localhost:3000/image', {
+            method: 'put',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+              id: this.state.user.id
+            })
+          })
+            .then(response => response.json())
+            .then(count => {
+              this.setState(Object.assign(this.state.user, { entries: count}))
+            })
+
+        }
+        this.displayFaceBox(this.calculateFaceLocation(response))
+      })
+      .catch(err => console.log(err));
   }
 
   onRouteChange = (r) => {
@@ -93,25 +128,27 @@ class App extends Component {
   }
 
   render(){
-
     return(
       <div className="App">
-        <Particles params = {particleOptions} className = "particle" />
+        <Particles params = {particlesOption} className = "particles" />
         <Navigaton isSignedIn={this.state.isSignedIn} onRouteChange = {this.onRouteChange}/>
         {
           this.state.route === "home"
           ? 
             <div>
               <Logo />
-              <Rank/>
+              <Rank
+                name={this.state.user.name}
+                entries={this.state.user.entries}
+              />
               <ImageLinkForm onInputChange = {this.onInputChange} onSubmit = {this.onSubmit}/>
               <FaceRecognition faces = {this.state.faces} imageUrl = {this.state.imageUrl}/>
             </div>
           : this.state.route === "signin"
             ?
-            <SignIn onRouteChange = {this.onRouteChange}/>
+            <SignIn loadUser={this.loadUser} onRouteChange = {this.onRouteChange}/>
             :
-            <Register onRouteChange = {this.onRouteChange}/>
+            <Register loadUser={this.loadUser} onRouteChange = {this.onRouteChange}/>
           
         }
       </div>
