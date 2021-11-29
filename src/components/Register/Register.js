@@ -49,7 +49,7 @@ class Register extends React.Component{
                         <div className="mt3">
                             <label className="db fw6 lh-copy f6 white" htmlFor="name">Name</label>
                             <input 
-                            className="pa2 input-reset ba bg-transparent hover-bg-black-30 hover-white w-100 " 
+                            className="pa2 input-reset ba bg-transparent hover-bg-black-30 hover-white w-100 white" 
                             type="text" 
                             name="name"  
                             id="name"
@@ -59,7 +59,7 @@ class Register extends React.Component{
                         <div className="mt3">
                             <label className="db fw6 lh-copy f6 white" htmlFor="email-address">Email</label>
                             <input 
-                            className="pa2 input-reset ba bg-transparent hover-bg-black-30 hover-white w-100 " 
+                            className="pa2 input-reset ba bg-transparent hover-bg-black-30 hover-white w-100 white" 
                             type="email" 
                             name="email-address"  
                             id="email-address"
@@ -69,7 +69,7 @@ class Register extends React.Component{
                         <div className="mv3">
                             <label className="db fw6 lh-copy f6 white" htmlFor="password">Password</label>
                             <input 
-                            className="b pa2 input-reset ba bg-transparent hover-bg-black hover-bg-black-30 w-100" 
+                            className="b pa2 input-reset ba bg-transparent hover-bg-black hover-bg-black-30 w-100 white" 
                             type="password" 
                             name="password"  
                             id="password"
