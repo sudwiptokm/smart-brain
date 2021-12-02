@@ -118,6 +118,8 @@ class App extends Component {
 
   onRouteChange = (r) => {
     if (r === 'signout') {
+      this.setState({faces: []})
+      this.setState({imageUrl: ""})
       this.setState({isSignedIn: false})
     } else if (r === 'home') {
       this.setState({isSignedIn: true})
